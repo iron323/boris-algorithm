@@ -49,7 +49,7 @@ public class Vector3 {
         return new Vector3(x1, y1, z1);
     }
 
-    public double Lorentz_Factor_from_U(double c = 299792458) {
+    public double Lorentz_Factor_from_U(double c = 299792458.0) {
         double u_square = x * x + y * y + z * z;
         double beta1 = u_square / (c * c);
         return Math.Sqrt(1 + beta1);
