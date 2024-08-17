@@ -39,10 +39,13 @@ public class Vector3 {
         double z = former.z * latter.z;
         return x + y + z;
     }
-
+    /// <summary>
+    /// return zero vector for zero vector
+    /// </summary>
+    /// <returns></returns>
     public Vector3 Normalized() {
         double l = Math.Sqrt(x * x + y * y + z * z);
-        if (l <= 0) throw new Exception("zero vector cannot be normalized");
+        if (l <= 0) return new Vector3(0, 0, 0);
         double x1 = x / l;
         double y1 = y / l;
         double z1 = z / l;
@@ -108,6 +111,13 @@ public class Boris_Solver {
         Update_U();
         Update_X();
         return X_after;
+    }
+
+    public Vector3 Get_E_field(Vector3 pos) {
+        return E_field.Get_Vector(pos).Copy();
+    }
+    public Vector3 Get_B_field(Vector3 pos) {
+        return B_field.Get_Vector(pos).Copy();
     }
 
     private void Update_U() {
