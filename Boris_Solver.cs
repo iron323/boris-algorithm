@@ -49,11 +49,16 @@ public class Vector3 {
         return new Vector3(x1, y1, z1);
     }
 
-    public double Lorentz_Factor_from_U(double c = 299792458.0) {
+    public double Lorentz_Factor_from_U(double c = 299792458) {
         double u_square = x * x + y * y + z * z;
         double beta1 = u_square / (c * c);
         return Math.Sqrt(1 + beta1);
-
+    }
+    public double Lorentz_Factor_from_V(double c = 299792458) {
+        double v_square = x * x + y * y + z * z;
+        double beta1 = v_square / (c * c);
+        if (1 - beta1 <= 0) throw new Exception("faster than light");
+        return 1 / Math.Sqrt(1 - beta1);
     }
 
     public double Magnitude() {
@@ -93,7 +98,7 @@ public class Boris_Solver {
         t_dif = time_dif;
         this.E_field = E_field;
         this.B_field = B_field;
-        U_after = init_vel;
+        U_after = init_vel * init_vel.Lorentz_Factor_from_V();
         X_after = init_pos + init_vel * (time_dif/2);
         x_step = 0.5m;
         u_step = 0.0m;
