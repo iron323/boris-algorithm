@@ -77,19 +77,20 @@ public class Vector3 {
         return text;
     }
 }
+public class Field {
+    Vector3 field;
+    public Field(Vector3 v) {
+        field = v;
+    }
+    public Vector3 Get_Vector(Vector3 pos) {
+        return field.Copy();
+    }
+}
 
 public class Boris_Solver {
 
 
-    public class Field {
-        Vector3 field;
-        public Field(Vector3 v) {
-            field = v;
-        }
-        public Vector3 Get_Vector(Vector3 pos) {
-            return field.Copy();
-        }
-    }
+
 
     double q, m, t_dif;
     Vector3 U_before, U_after, X_before, X_after;
