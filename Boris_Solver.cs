@@ -7,9 +7,18 @@ public class Vector3 {
         this.z = z;
     }
 
-    public static Vector3 Zero() {
-        return new Vector3(0, 0, 0);
+    static public Vector3 Zero {
+        get {
+            return new Vector3(0, 0, 0);
+        }
     }
+
+    static public Vector3 Up {
+        get {
+            return new Vector3(0, 0, 1);
+        }
+    }
+
     public static Vector3 operator +(Vector3 v1, Vector3 v2) {
         return new Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
     }
@@ -89,7 +98,7 @@ abstract public class Field {
 
     public Vector3 Get_Vector(Vector3 pos) {
         int count = types.Count;
-        Vector3 vector_sum = Vector3.Zero();
+        Vector3 vector_sum = Vector3.Zero;
         
         for (int i = 0; i < count; i++) {
             vector_sum += types[i].Get_Vector(pos);
@@ -100,12 +109,12 @@ abstract public class Field {
 
 public class E_Field : Field {
 
-    public class E_Field_Type : Field_Type {
-        public E_Type type;
+    public class E_Type : Field_Type {
+        public E_Field_Type type;
         private Vector3 origin;
         private Vector3 direction;
         private double magnitude;
-        public enum E_Type {
+        public enum E_Field_Type {
             point,
             dipole,
             uniform,
@@ -113,42 +122,42 @@ public class E_Field : Field {
         }
 
         public override Vector3 Get_Vector(Vector3 pos) {
-            if (type == E_Type.point) {
+            if (type == E_Field_Type.point) {
                 return (magnitude / Math.Pow((pos - origin).Magnitude(), 2)) * (pos - origin).Normalized();
             }
-            else if (type == E_Type.uniform) {
+            else if (type == E_Field_Type.uniform) {
                 return magnitude * direction;
             }
-            else if (type == E_Type.line) {
+            else if (type == E_Field_Type.line) {
                 double t = (Vector3.Dot(pos, direction) - Vector3.Dot(direction, origin)) / Vector3.Dot(direction, direction);
                 Vector3 s = origin + t * direction; //s is shortest point to pos on line
 
                 double distance = (pos - s).Magnitude();
                 return magnitude * (pos - s).Normalized() / distance;
             }
-            else if (type == E_Type.dipole) {
+            else if (type == E_Field_Type.dipole) {
                 double l = (pos - origin).Magnitude();
                 Vector3 d = direction.Normalized();
                 Vector3 p = (pos - origin).Normalized();
                 return (Vector3.Dot(d, p) * p - d) * magnitude / Math.Pow(l, 3);
             }
-            else return Vector3.Zero();
+            else return Vector3.Zero;
         }
 
-        private E_Field_Type(E_Type type, Vector3 origin, Vector3 direction, double magnitude = 1) {
+        private E_Type(E_Field_Type type, Vector3 origin, Vector3 direction, double magnitude = 1) {
             this.type = type;
             this.origin = origin;
             this.direction = direction;
             this.magnitude = magnitude;
         }
-        public static E_Field_Type Point_Field(Vector3 origin, double magnitude = 1) {
-            return new E_Field_Type(E_Type.point, origin, Vector3.Zero(), magnitude); ;
+        public static E_Type Point_Field(Vector3 origin, double magnitude = 1) {
+            return new E_Type(E_Field_Type.point, origin, Vector3.Zero, magnitude); ;
         }
-        public static E_Field_Type Uniform_Field(Vector3 direction, double magnitude = 1) {
-            return new E_Field_Type(E_Type.uniform, Vector3.Zero(), direction, magnitude);
+        public static E_Type Uniform_Field(Vector3 direction, double magnitude = 1) {
+            return new E_Type(E_Field_Type.uniform, Vector3.Zero, direction, magnitude);
         }
-        public static E_Field_Type Line_Field(Vector3 origin, Vector3 current_direction, double magnitude = 1) {
-            return new E_Field_Type(E_Type.line, origin, current_direction, magnitude);
+        public static E_Type Line_Field(Vector3 origin, Vector3 current_direction, double magnitude = 1) {
+            return new E_Type(E_Field_Type.line, origin, current_direction, magnitude);
         }
         /// <summary>
         /// positive is north
@@ -157,23 +166,23 @@ public class E_Field : Field {
         /// <param name="axis_direction"></param>
         /// <param name="magnitude">strength at equator distance 1</param>
         /// <returns></returns>
-        public static E_Field_Type Dipole_Field(Vector3 origin, Vector3 axis_direction, double magnitude = 1) {
-            return new E_Field_Type(E_Type.dipole, origin, axis_direction, magnitude);
+        public static E_Type Dipole_Field(Vector3 origin, Vector3 axis_direction, double magnitude = 1) {
+            return new E_Type(E_Field_Type.dipole, origin, axis_direction, magnitude);
         }
 
     }
-    public E_Field(List<E_Field_Type> types) {
+    public E_Field(List<E_Type> types) {
         this.types = types.Select(x=>(Field_Type)x).ToList();
     }
 }
 
 public class B_Field : Field {
-    public class B_Field_Type : Field_Type {
-        public B_Type type;
+    public class B_Type : Field_Type {
+        public B_Field_Type type;
         private Vector3 origin;
         private Vector3 direction;
         private double magnitude;
-        public enum B_Type {
+        public enum B_Field_Type {
             point,
             dipole,
             uniform,
@@ -181,29 +190,29 @@ public class B_Field : Field {
         }
 
         public override Vector3 Get_Vector(Vector3 pos) {
-            if (type == B_Type.point) {
+            if (type == B_Field_Type.point) {
                 return (magnitude / Math.Pow((pos - origin).Magnitude(), 2)) * (pos - origin).Normalized();
             }
-            else if (type == B_Type.uniform) {
+            else if (type == B_Field_Type.uniform) {
                 return magnitude * direction;
             }
-            else if (type == B_Type.line) {
+            else if (type == B_Field_Type.line) {
                 double t = (Vector3.Dot(pos, direction) - Vector3.Dot(direction, origin)) / Vector3.Dot(direction, direction);
                 Vector3 s = origin + t * direction; //s is shortest point to pos on line
 
                 double distance = (pos - s).Magnitude();
                 return magnitude * Vector3.Cross(direction, pos - s).Normalized() / distance;
             }
-            else if (type == B_Type.dipole) {
+            else if (type == B_Field_Type.dipole) {
                 double l = (pos - origin).Magnitude();
                 Vector3 d = direction.Normalized();
                 Vector3 p = (pos - origin).Normalized();
                 return (Vector3.Dot(d, p) * p - d) * magnitude / Math.Pow(l, 3);
             }
-            else return Vector3.Zero();
+            else return Vector3.Zero;
         }
 
-        private B_Field_Type(B_Type type, Vector3 origin, Vector3 direction, double magnitude = 1) {
+        private B_Type(B_Field_Type type, Vector3 origin, Vector3 direction, double magnitude = 1) {
             this.type = type;
             this.origin = origin;
             this.direction = direction;
@@ -216,22 +225,22 @@ public class B_Field : Field {
         /// <param name="origin"></param>
         /// <param name="magnitude">negative for -</param>
         /// <returns></returns>
-        public static B_Field_Type Point_Field(Vector3 origin, double magnitude = 1) {
-            return new B_Field_Type(B_Type.point, origin, Vector3.Zero(), magnitude); ;
+        public static B_Type Point_Field(Vector3 origin, double magnitude = 1) {
+            return new B_Type(B_Field_Type.point, origin, Vector3.Zero, magnitude); ;
         }
-        public static B_Field_Type Uniform_Field(Vector3 direction, double magnitude = 1) {
-            return new B_Field_Type(B_Type.uniform, Vector3.Zero(), direction, magnitude);
+        public static B_Type Uniform_Field(Vector3 direction, double magnitude = 1) {
+            return new B_Type(B_Field_Type.uniform, Vector3.Zero, direction, magnitude);
         }
-        public static B_Field_Type Line_Field(Vector3 origin, Vector3 current_direction, double magnitude = 1) {
-            return new B_Field_Type(B_Type.line, origin, current_direction, magnitude);
+        public static B_Type Line_Field(Vector3 origin, Vector3 current_direction, double magnitude = 1) {
+            return new B_Type(B_Field_Type.line, origin, current_direction, magnitude);
         }
-        public static B_Field_Type Dipole_Field(Vector3 origin, Vector3 axis_direction, double magnitude = 1) {
-            return new B_Field_Type(B_Type.dipole, origin, axis_direction, magnitude);
+        public static B_Type Dipole_Field(Vector3 origin, Vector3 axis_direction, double magnitude = 1) {
+            return new B_Type(B_Field_Type.dipole, origin, axis_direction, magnitude);
         }
 
     }
 
-    public B_Field(List<B_Field_Type> types) {
+    public B_Field(List<B_Type> types) {
         this.types = types.Select(x => (Field_Type)x).ToList();
     }
     
@@ -243,7 +252,7 @@ public class Boris_Solver {
     Vector3 U_before, U_after, X_before, X_after;
     Field E_field, B_field;
     public decimal x_step, u_step;
-    public Boris_Solver(double charge, double mass, double time_dif, Field E_field, Field B_field, Vector3 init_vel, Vector3 init_pos) {
+    public Boris_Solver(double charge, double mass, double time_dif, E_Field E_field, B_Field B_field, Vector3 init_vel, Vector3 init_pos) {
         q = charge;
         m = mass;
         t_dif = time_dif;
@@ -289,6 +298,5 @@ public class Boris_Solver {
         x_step += 1.0m;
     }
     
-
 
 }
