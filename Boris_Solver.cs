@@ -171,8 +171,13 @@ public class E_Field : Field {
         }
 
     }
-    public E_Field(List<E_Type> types) {
-        this.types = types.Select(x=>(Field_Type)x).ToList();
+    /// <summary>
+    /// put null if there is no e field
+    /// </summary>
+    /// <param name="types"></param>
+    public E_Field(List<E_Type> types = null) {
+        if (types == null) this.types = new List<Field_Type>();
+        else this.types = types.Select(x=>(Field_Type)x).ToList();
     }
 }
 
@@ -239,12 +244,15 @@ public class B_Field : Field {
         }
 
     }
-
-    public B_Field(List<B_Type> types) {
-        this.types = types.Select(x => (Field_Type)x).ToList();
+    /// <summary>
+    /// put null if there is no b field
+    /// </summary>
+    /// <param name="types"></param>
+    public B_Field(List<B_Type> types = null) {
+        if (types == null) this.types = new List<Field_Type>();
+        else this.types = types.Select(x => (Field_Type)x).ToList();
     }
     
-
 }
 
 public class Boris_Solver {
